@@ -2,9 +2,11 @@ import './App.css';
 import Navigation from './components/Navigation/Navigation';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
+import SignIn from './components/SignIn/SignIn';
 import Rank from './components/Rank/Rank';
 import Particles from 'react-particles-js';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
+import Register from './components/Register/Register';
 import { Component } from 'react';
 const Clarifai = require('clarifai');
 const particleOptions = {
@@ -35,7 +37,9 @@ class App extends Component{
     this.state = {
       input: '',
       imageUrl: '',
-      box: {}
+      box: {},
+      route: 'signIn',
+      isSignedIn: false
     }
   }
   calculateFaceLocation = (data) => {
@@ -69,20 +73,36 @@ class App extends Component{
   onInputChange = (event) => {
     this.setState({input: event.target.value});
   }
+  onRouteChange = (route) => {
+    if(route === 'signOut') {
+      this.setState({isSignedIn:false})
+    }else if (route === 'home') {
+      this.setState({isSignedIn:true})
+    }
+    this.setState({route: route});
+  }
 
 render(){
+
   return (
     <div className="App">
        <Particles className="particles"
          params={particleOptions}
        />
-     <Navigation />
-     <Logo />
-     <Rank />
-     <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onSubmit}/>
-
-     <FaceRecognition imageUrl={this.state.imageUrl} box={this.state.box}/>
- 
+      <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn} />
+     {this.state.route === 'home' ? 
+      <div>
+     
+      <Logo />
+      <Rank />
+      <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onSubmit}/>
+      <FaceRecognition imageUrl={this.state.imageUrl} box={this.state.box}/>
+      </div>
+      : (
+        this.state.route ==='signIn' ? <SignIn onRouteChange={this.onRouteChange} /> :
+        <Register onRouteChange={this.onRouteChange} /> 
+      )
+     } 
     </div>
   );
 }
